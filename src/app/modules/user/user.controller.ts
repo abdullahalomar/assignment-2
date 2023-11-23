@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
+import userValidationSchema from './user.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
     const user = req.body;
-    const result = await UserServices.createUserInDB(user);
+    const zodParseData = userValidationSchema.parse(user);
+    const result = await UserServices.createUserInDB(zodParseData);
 
     res.status(200).json({
       success: true,
@@ -12,7 +14,14 @@ const createUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
+    });
   }
 };
 

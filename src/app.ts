@@ -9,8 +9,10 @@ app.use(cors());
 app.use('/api', UserRoutes);
 
 app.get('/', (req: Request, res: Response) => {
-  const x = 20;
-  res.send(x);
+  res.send({
+    success: true,
+    message: 'welcome to my running app with port 5000',
+  });
 });
 
 export default app;
