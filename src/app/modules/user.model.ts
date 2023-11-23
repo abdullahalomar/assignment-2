@@ -1,8 +1,12 @@
 import { Schema, model } from 'mongoose';
-import { User } from './user/user.interface';
+import { TUser, UserModel } from './user/user.interface';
 import validator from 'validator';
+import bcrypt from 'bcrypt';
+import config from '../config';
+import { bool } from 'joi';
+import { boolean } from 'zod';
 
-const userSchema = new Schema<User>({
+const userSchema = new Schema<TUser, UserModel>({
   userId: { type: Number, required: true, unique: true },
   username: {
     type: String,
@@ -66,6 +70,10 @@ const userSchema = new Schema<User>({
       required: [true, 'country is required'],
     },
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
   orders: [
     {
       productName: {
@@ -84,4 +92,33 @@ const userSchema = new Schema<User>({
   ],
 });
 
-export const UserModel = model<User>('User', userSchema);
+userSchema.pre('save', async function (next) {
+  const user = this;
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_round),
+  );
+  next();
+});
+
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
+});
+
+// query middleware
+userSchema.pre('find', function (next) {
+  console.log(this);
+});
+
+userSchema.statics.isUserExists = async function (userId: string) {
+  const existingUSer = await User.findOne({ userId });
+  return existingUSer;
+};
+
+// userSchema.methods.isUserExists = async function (userId: string) {
+//   const existingUser = await User.findOne({ userId });
+//   return existingUser;
+// };
+
+export const User = model<TUser, UserModel>('User', userSchema);

@@ -1,6 +1,7 @@
+import { Model } from 'mongoose';
 import {} from 'mongoose';
 
-export type User = {
+export type TUser = {
   userId: number;
   username: string;
   password: string;
@@ -24,4 +25,17 @@ export type User = {
       quantity: number;
     },
   ];
+  isDeleted: {
+    type: boolean;
+  };
 };
+
+export interface UserModel extends Model<TUser> {
+  isUserExists(userId: string): Promise<TUser | null>;
+}
+
+// export type UserMethods = {
+//   isUserExists(userId: string): Promise<TUser | null>;
+// };
+
+// export type UserModel = Model<TUser, Record<string, never>, UserMethods>;
