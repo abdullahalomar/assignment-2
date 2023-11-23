@@ -64,7 +64,7 @@ const deleteUser = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: 'User deleted successfully!',
-      data: null,
+      data: result,
     });
   } catch (error: any) {
     res.status(500).json({
@@ -77,6 +77,10 @@ const deleteUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+// update
+
+// update
 
 export const UserControllers = {
   createUser,

@@ -1,10 +1,9 @@
-import { Schema, model } from 'mongoose';
+import { Model, Schema, model } from 'mongoose';
 import { TUser, UserModel } from './user/user.interface';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import config from '../config';
-import { bool } from 'joi';
-import { boolean } from 'zod';
+import { string } from 'zod';
 
 const userSchema = new Schema<TUser, UserModel>({
   userId: { type: Number, required: true, unique: true },
@@ -70,10 +69,7 @@ const userSchema = new Schema<TUser, UserModel>({
       required: [true, 'country is required'],
     },
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
+
   orders: [
     {
       productName: {
@@ -90,6 +86,10 @@ const userSchema = new Schema<TUser, UserModel>({
       },
     },
   ],
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 userSchema.pre('save', async function (next) {
@@ -108,13 +108,20 @@ userSchema.post('save', function (doc, next) {
 
 // query middleware
 userSchema.pre('find', function (next) {
-  console.log(this);
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+userSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
 });
 
 userSchema.statics.isUserExists = async function (userId: string) {
   const existingUSer = await User.findOne({ userId });
   return existingUSer;
 };
+
+// update
 
 // userSchema.methods.isUserExists = async function (userId: string) {
 //   const existingUser = await User.findOne({ userId });
