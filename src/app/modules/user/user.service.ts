@@ -1,3 +1,4 @@
+import { FilterQuery, UpdateQuery } from 'mongoose';
 import { User } from '../user.model';
 import { TUser } from './user.interface';
 
@@ -6,12 +7,6 @@ const createUserInDB = async (userData: TUser) => {
     throw new Error('User already exist!');
   }
   const result = await User.create(userData);
-
-  // const user = new User(userData);
-  // if (await user.isUserExists(userData.userId)) {
-  //   throw new Error('User already exist!');
-  // }
-  // const result = await user.save();
   return result;
 };
 
@@ -20,13 +15,22 @@ const getAllUserInDB = async () => {
   return result;
 };
 
-const getSingleUserInDB = async (userId: string) => {
+const getSingleUserInDB = async (userId: number) => {
   const result = await User.findOne({ userId });
   return result;
 };
 
-const deleteUserInDB = async (userId: string) => {
-  const result = await User.updateOne({ userId }, { isDeleted: true });
+const updateUserInDB = async function (
+  userId: number,
+  data: UpdateQuery<TUser>,
+): Promise<TUser | null> {
+  // const result = User.findOne({ userId });
+  const updateRes = User.findOneAndUpdate({ userId }, data);
+  return updateRes;
+};
+
+const deleteUserInDB = async (userId: number) => {
+  const result = await User.deleteOne({ userId });
   return result;
 };
 
@@ -35,4 +39,5 @@ export const UserServices = {
   getAllUserInDB,
   getSingleUserInDB,
   deleteUserInDB,
+  updateUserInDB,
 };

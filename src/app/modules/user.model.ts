@@ -1,9 +1,8 @@
-import { Model, Schema, model } from 'mongoose';
+import { Schema, UpdateQuery, model } from 'mongoose';
 import { TUser, UserModel } from './user/user.interface';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import config from '../config';
-import { string } from 'zod';
 
 const userSchema = new Schema<TUser, UserModel>({
   userId: { type: Number, required: true, unique: true },
@@ -12,7 +11,7 @@ const userSchema = new Schema<TUser, UserModel>({
     required: [true, 'User name is required'],
     trim: true,
     unique: true,
-    maxlength: [10, 'hedfheh'],
+    max: 25,
   },
   password: {
     type: String,
@@ -86,16 +85,11 @@ const userSchema = new Schema<TUser, UserModel>({
       },
     },
   ],
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
 });
 
 userSchema.pre('save', async function (next) {
-  const user = this;
-  user.password = await bcrypt.hash(
-    user.password,
+  this.password = await bcrypt.hash(
+    this.password,
     Number(config.bcrypt_salt_round),
   );
   next();
@@ -106,23 +100,31 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-// query middleware
-userSchema.pre('find', function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
-userSchema.pre('findOne', function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
-
-userSchema.statics.isUserExists = async function (userId: string) {
-  const existingUSer = await User.findOne({ userId });
-  return existingUSer;
-};
+// userSchema.statics.isUserExists = async function (userId: number) {
+//   const existingUSer = await User.findOne({ userId });
+//   return existingUSer;
+// };
 
 // update
+userSchema.statics.isUserExists = function (
+  userId: number,
+): Promise<TUser | null> {
+  return this.findOne({ userId }).exec();
+};
 
+userSchema.statics.updateUserById = function (
+  userId: number,
+  updateData: UpdateQuery<TUser>,
+): Promise<TUser | null> {
+  return this.findOneAndUpdate(userId, updateData).exec();
+};
+
+// delete
+userSchema.statics.deleteUserById = function (
+  userId: number,
+): Promise<TUser | null> {
+  return this.findByIdAndDelete(userId).exec();
+};
 // userSchema.methods.isUserExists = async function (userId: string) {
 //   const existingUser = await User.findOne({ userId });
 //   return existingUser;

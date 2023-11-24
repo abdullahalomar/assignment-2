@@ -25,13 +25,10 @@ export type TUser = {
       quantity: number;
     },
   ];
-  isDeleted: {
-    type: boolean;
-  };
 };
 
 export interface UserModel extends Model<TUser> {
-  isUserExists(userId: string): Promise<TUser | null>;
+  isUserExists(userId: number): Promise<TUser | null>;
 }
 
 // export type UserMethods = {

@@ -30,7 +30,6 @@ const userValidationSchema = z.object({
       .string()
       .max(30, { message: 'country must be 30 or fewer characters long' }),
   }),
-  isDeleted: z.boolean(),
 });
 
 export default userValidationSchema;
