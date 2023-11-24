@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
 import userValidationSchema from './user.validation';
 import { UpdateQuery } from 'mongoose';
 import { TUser } from './user.interface';
 
+//create user
 const createUser = async (req: Request, res: Response) => {
   try {
     const user = req.body;
@@ -24,6 +26,7 @@ const createUser = async (req: Request, res: Response) => {
   }
 };
 
+//all user
 const getAllUser = async (req: Request, res: Response) => {
   try {
     const result = await UserServices.getAllUserInDB();
@@ -41,6 +44,7 @@ const getAllUser = async (req: Request, res: Response) => {
   }
 };
 
+//single user
 const getSingleUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
@@ -59,6 +63,41 @@ const getSingleUser = async (req: Request, res: Response) => {
   }
 };
 
+// update
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const updateData: UpdateQuery<TUser> = req.body;
+
+    const updatedUser = await UserServices.updateUserInDB(userId, updateData);
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully!',
+      data: updatedUser,
+    });
+  } catch (error: any) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: {
+        code: 500,
+        description:
+          'Internal server error. Please check the server logs for details.',
+      },
+    });
+  }
+};
+
+//delete
 const deleteUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -88,44 +127,17 @@ const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-// update
-// const updateUser = async (req: Request, res: Response) => {
-//   try {
-//     const { userId } = req.params;
-//     const updateData: UpdateQuery<TUser> = req.body;
-
-//     const updatedUser = await UserServices.updateUserInDB(userId, updateData);
-
-//     if (!updatedUser) {
-//       return res
-//         .status(404)
-//         .json({ success: false, message: 'User not found' });
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       message: 'User updated successfully!',
-//       data: updatedUser,
-//     });
-//   } catch (error: any) {
-//     console.log(error);
-//     res.status(500).json({
-//       success: false,
-//       message: 'User not found',
-//       error: {
-//         code: 404,
-//         description: 'User not found!',
-//       },
-//     });
-//   }
-// };
-const updateUser = async (req: Request, res: Response) => {
+//put order
+const addProductOrder = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
-    const updateData: UpdateQuery<TUser> = req.body;
+    const userId = req.params.userId;
+    const productData = req.body;
 
-    const updatedUser = await UserServices.updateUserInDB(userId, updateData);
-    console.log(updateData);
+    const updatedUser = await UserServices.addProductOrderDB(
+      userId,
+      productData,
+    );
+
     if (!updatedUser) {
       return res.status(404).json({
         success: false,
@@ -135,7 +147,7 @@ const updateUser = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: 'User updated successfully!',
+      message: 'Product added to order successfully!',
       data: updatedUser,
     });
   } catch (error: any) {
@@ -143,16 +155,14 @@ const updateUser = async (req: Request, res: Response) => {
 
     res.status(500).json({
       success: false,
-      message: 'Internal server error',
+      message: 'User not found',
       error: {
-        code: 500,
-        description:
-          'Internal server error. Please check the server logs for details.',
+        code: 404,
+        description: 'User not found!',
       },
     });
   }
 };
-// update
 
 export const UserControllers = {
   createUser,
@@ -160,4 +170,5 @@ export const UserControllers = {
   getSingleUser,
   deleteUser,
   updateUser,
+  addProductOrder,
 };

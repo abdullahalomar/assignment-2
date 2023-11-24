@@ -1,4 +1,5 @@
-import { Schema, UpdateQuery, model } from 'mongoose';
+/* eslint-disable no-unused-vars */
+import { Model, Schema, UpdateQuery, model } from 'mongoose';
 import { TUser, UserModel } from './user/user.interface';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
@@ -100,34 +101,65 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-// userSchema.statics.isUserExists = async function (userId: number) {
-//   const existingUSer = await User.findOne({ userId });
-//   return existingUSer;
+//user update
+// userSchema.statics.isUserExists = function (
+//   userId: number,
+// ): Promise<TUser | null> {
+//   return this.findOne({ userId }).exec();
 // };
 
-// update
-userSchema.statics.isUserExists = function (
-  userId: number,
-): Promise<TUser | null> {
-  return this.findOne({ userId }).exec();
-};
-
-userSchema.statics.updateUserById = function (
-  userId: number,
-  updateData: UpdateQuery<TUser>,
-): Promise<TUser | null> {
-  return this.findOneAndUpdate(userId, updateData).exec();
-};
-
-// delete
-userSchema.statics.deleteUserById = function (
-  userId: number,
-): Promise<TUser | null> {
-  return this.findByIdAndDelete(userId).exec();
-};
-// userSchema.methods.isUserExists = async function (userId: string) {
-//   const existingUser = await User.findOne({ userId });
-//   return existingUser;
+// userSchema.statics.updateUserById = function (
+//   userId: number,
+//   updateData: UpdateQuery<TUser>,
+// ): Promise<TUser | null> {
+//   return this.findOneAndUpdate(userId, updateData).exec();
 // };
+
+// //user delete
+// userSchema.statics.addProductToOrder = async function (
+//   userId: number,
+//   product: TUser,
+// ): Promise<void> {
+//   const user = await this.findOne({ userId });
+
+//   if (!user) {
+//     throw new Error(`User with userId ${userId} not found`);
+//   }
+
+//   if (!user.orders) {
+//     user.orders = [];
+//   }
+
+//   user.orders.push(product);
+//   await user.save();
+// };
+
+userSchema.statics.addProductToOrder = async function (
+  userId: number,
+  productData: {
+    productName: string;
+    price: number;
+    quantity: number;
+  },
+): Promise<void> {
+  const user = await this.findOne({ userId });
+
+  if (!user) {
+    throw new Error(`User with userId ${userId} not found`);
+  }
+
+  if (!user.orders) {
+    user.orders = [];
+  }
+
+  // Add the product details to the orders array
+  user.orders.push({
+    productName: productData.productName,
+    price: productData.price,
+    quantity: productData.quantity,
+  });
+
+  await user.save();
+};
 
 export const User = model<TUser, UserModel>('User', userSchema);

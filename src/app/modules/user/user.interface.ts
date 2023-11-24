@@ -30,9 +30,3 @@ export type TUser = {
 export interface UserModel extends Model<TUser> {
   isUserExists(userId: number): Promise<TUser | null>;
 }
-
-// export type UserMethods = {
-//   isUserExists(userId: string): Promise<TUser | null>;
-// };
-
-// export type UserModel = Model<TUser, Record<string, never>, UserMethods>;
