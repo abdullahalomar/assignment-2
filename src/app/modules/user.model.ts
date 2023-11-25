@@ -101,38 +101,26 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-//user update
-// userSchema.statics.isUserExists = function (
-//   userId: number,
-// ): Promise<TUser | null> {
-//   return this.findOne({ userId }).exec();
-// };
+// user update
+userSchema.statics.isUserExists = function (
+  userId: number,
+): Promise<TUser | null> {
+  return this.findOne({ userId }).exec();
+};
 
-// userSchema.statics.updateUserById = function (
-//   userId: number,
-//   updateData: UpdateQuery<TUser>,
-// ): Promise<TUser | null> {
-//   return this.findOneAndUpdate(userId, updateData).exec();
-// };
+userSchema.statics.updateUserById = function (
+  userId: number,
+  updateData: UpdateQuery<TUser>,
+): Promise<TUser | null> {
+  return this.findOneAndUpdate(userId, updateData).exec();
+};
 
-// //user delete
-// userSchema.statics.addProductToOrder = async function (
-//   userId: number,
-//   product: TUser,
-// ): Promise<void> {
-//   const user = await this.findOne({ userId });
-
-//   if (!user) {
-//     throw new Error(`User with userId ${userId} not found`);
-//   }
-
-//   if (!user.orders) {
-//     user.orders = [];
-//   }
-
-//   user.orders.push(product);
-//   await user.save();
-// };
+// delete
+userSchema.statics.deleteUserById = function (
+  userId: number,
+): Promise<TUser | null> {
+  return this.findByIdAndDelete(userId).exec();
+};
 
 userSchema.statics.addProductToOrder = async function (
   userId: number,
@@ -152,7 +140,6 @@ userSchema.statics.addProductToOrder = async function (
     user.orders = [];
   }
 
-  // Add the product details to the orders array
   user.orders.push({
     productName: productData.productName,
     price: productData.price,

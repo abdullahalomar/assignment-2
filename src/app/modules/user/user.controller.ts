@@ -130,15 +130,16 @@ const deleteUser = async (req: Request, res: Response) => {
 //put order
 const addProductOrder = async (req: Request, res: Response) => {
   try {
-    const userId = req.params.userId;
+    const { userId } = req.params;
     const productData = req.body;
+    console.log(productData);
 
-    const updatedUser = await UserServices.addProductOrderDB(
+    const updateProduct = await UserServices.addProductOrderDB(
       userId,
       productData,
     );
 
-    if (!updatedUser) {
+    if (!updateProduct) {
       return res.status(404).json({
         success: false,
         message: 'User not found',
@@ -148,7 +149,7 @@ const addProductOrder = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: 'Product added to order successfully!',
-      data: updatedUser,
+      data: updateProduct,
     });
   } catch (error: any) {
     console.error(error);
@@ -164,6 +165,25 @@ const addProductOrder = async (req: Request, res: Response) => {
   }
 };
 
+//single order by user
+const getSingleOrderByUser = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.userId;
+    const result = await UserServices.getSingleOrderInDB(id);
+    res.status(200).json({
+      success: true,
+      message: 'User fetched successfully!',
+      data: result?.orders,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'something went wrong',
+      error: error,
+    });
+  }
+};
+
 export const UserControllers = {
   createUser,
   getAllUser,
@@ -171,4 +191,5 @@ export const UserControllers = {
   deleteUser,
   updateUser,
   addProductOrder,
+  getSingleOrderByUser,
 };

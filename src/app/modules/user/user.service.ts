@@ -49,7 +49,8 @@ const addProductOrderDB = async function (
   productData: { productName: string; price: number; quantity: number },
 ): Promise<TUser | null> {
   try {
-    const updatedUser = await User.findOneAndUpdate(
+    console.log(productData);
+    const productToUpdate = await User.findOneAndUpdate(
       { userId },
       {
         $push: {
@@ -63,14 +64,20 @@ const addProductOrderDB = async function (
       { new: true, select: { password: 0 } },
     );
 
-    if (!updatedUser) {
+    if (!productToUpdate) {
       throw new Error('User not found');
     }
 
-    return updatedUser;
+    return productToUpdate;
   } catch (error) {
     throw error;
   }
+};
+
+// single order by user
+const getSingleOrderInDB = async (userId: number) => {
+  const result = await User.findOne({ userId });
+  return result;
 };
 
 export const UserServices = {
@@ -80,4 +87,5 @@ export const UserServices = {
   deleteUserInDB,
   updateUserInDB,
   addProductOrderDB,
+  getSingleOrderInDB,
 };
