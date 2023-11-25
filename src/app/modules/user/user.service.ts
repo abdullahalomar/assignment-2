@@ -19,8 +19,14 @@ const getAllUserInDB = async () => {
 };
 
 // single user
-const getSingleUserInDB = async (userId: number) => {
-  const result = await User.findOne({ userId });
+const getSingleUserInDB = async (
+  userId: number,
+  data: UpdateQuery<TUser>,
+): Promise<TUser | null> => {
+  const result = await User.findOne({ userId }, data, {
+    new: true,
+    select: { password: 0 },
+  });
   return result;
 };
 
@@ -48,7 +54,6 @@ const addProductOrderDB = async function (
   productData: { productName: string; price: number; quantity: number },
 ): Promise<TUser | null> {
   try {
-    console.log(productData);
     const productToUpdate = await User.findOneAndUpdate(
       { userId },
       {

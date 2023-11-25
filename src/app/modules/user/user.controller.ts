@@ -48,17 +48,30 @@ const getAllUser = async (req: Request, res: Response) => {
 const getSingleUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
-    const result = await UserServices.getSingleUserInDB(id);
+    const singleUser = await UserServices.getSingleUserInDB(id);
+    if (!singleUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
     res.status(200).json({
       success: true,
       message: 'User fetched successfully!',
-      data: result,
+      data: singleUser,
     });
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: error.message || 'something went wrong',
-      error: error,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
     });
   }
 };
@@ -74,6 +87,10 @@ const updateUser = async (req: Request, res: Response) => {
       return res.status(404).json({
         success: false,
         message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
       });
     }
 
@@ -83,15 +100,12 @@ const updateUser = async (req: Request, res: Response) => {
       data: updatedUser,
     });
   } catch (error: any) {
-    console.error(error);
-
     res.status(500).json({
       success: false,
-      message: 'Internal server error',
+      message: 'User not found',
       error: {
-        code: 500,
-        description:
-          'Internal server error. Please check the server logs for details.',
+        code: 404,
+        description: 'User not found!',
       },
     });
   }
@@ -104,10 +118,15 @@ const deleteUser = async (req: Request, res: Response) => {
 
     const deletedUser = await UserServices.deleteUserInDB(userId);
 
-    if (!deletedUser) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'User not found' });
+    if (!deleteUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
     }
 
     res.status(200).json({
@@ -132,8 +151,6 @@ const addProductOrder = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const productData = req.body;
-    console.log(productData);
-
     const updateProduct = await UserServices.addProductOrderDB(
       userId,
       productData,
@@ -167,11 +184,21 @@ const addProductOrder = async (req: Request, res: Response) => {
 const getSingleOrderByUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
-    const result = await UserServices.getSingleOrderInDB(id);
+    const user = await UserServices.getSingleOrderInDB(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
     res.status(200).json({
       success: true,
       message: 'Order fetched successfully!',
-      data: result?.orders,
+      data: user?.orders,
     });
   } catch (error: any) {
     res.status(500).json({
@@ -188,12 +215,27 @@ const getSingleOrderByUser = async (req: Request, res: Response) => {
 //single order price by user
 const getSingleOrderPriceByUser = async (req: Request, res: Response) => {
   try {
-    const id = req.params.userId;
-    const result = await UserServices.getSingleOrderPriceInDB(id);
+    const { userId } = req.params;
+    const user = await UserServices.getSingleUserInDB(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+    const totalPrice = user.orders.reduce(
+      (sum, order) => sum + order.price * order.quantity,
+      0,
+    );
     res.status(200).json({
       success: true,
       message: 'Total price calculated successfully!',
-      data: result?.orders?.price,
+      data: { totalPrice },
     });
   } catch (error: any) {
     res.status(500).json({
