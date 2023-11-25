@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Model, Schema, UpdateQuery, model } from 'mongoose';
+import { Schema, UpdateQuery, model } from 'mongoose';
 import { TUser, UserModel } from './user/user.interface';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
