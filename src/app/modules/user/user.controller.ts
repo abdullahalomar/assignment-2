@@ -148,12 +148,10 @@ const addProductOrder = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: 'Product added to order successfully!',
-      data: updateProduct,
+      message: 'Order created successfully!',
+      data: null,
     });
   } catch (error: any) {
-    console.error(error);
-
     res.status(500).json({
       success: false,
       message: 'User not found',
@@ -172,14 +170,39 @@ const getSingleOrderByUser = async (req: Request, res: Response) => {
     const result = await UserServices.getSingleOrderInDB(id);
     res.status(200).json({
       success: true,
-      message: 'User fetched successfully!',
+      message: 'Order fetched successfully!',
       data: result?.orders,
     });
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: error.message || 'something went wrong',
-      error: error,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
+    });
+  }
+};
+
+//single order price by user
+const getSingleOrderPriceByUser = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.userId;
+    const result = await UserServices.getSingleOrderPriceInDB(id);
+    res.status(200).json({
+      success: true,
+      message: 'Total price calculated successfully!',
+      data: result?.orders?.price,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
     });
   }
 };
@@ -192,4 +215,5 @@ export const UserControllers = {
   updateUser,
   addProductOrder,
   getSingleOrderByUser,
+  getSingleOrderPriceByUser,
 };

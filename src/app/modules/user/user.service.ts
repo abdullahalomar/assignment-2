@@ -29,7 +29,6 @@ const updateUserInDB = async function (
   userId: number,
   data: UpdateQuery<TUser>,
 ): Promise<TUser | null> {
-  // const result = User.findOne({ userId });
   const updateRes = User.findOneAndUpdate({ userId }, data, {
     new: true,
     select: { password: 0 },
@@ -80,6 +79,12 @@ const getSingleOrderInDB = async (userId: number) => {
   return result;
 };
 
+// single user order total price
+const getSingleOrderPriceInDB = async (userId: number) => {
+  const result = await User.findOne({ userId });
+  return result;
+};
+
 export const UserServices = {
   createUserInDB,
   getAllUserInDB,
@@ -88,4 +93,5 @@ export const UserServices = {
   updateUserInDB,
   addProductOrderDB,
   getSingleOrderInDB,
+  getSingleOrderPriceInDB,
 };

@@ -119,9 +119,10 @@ userSchema.statics.updateUserById = function (
 userSchema.statics.deleteUserById = function (
   userId: number,
 ): Promise<TUser | null> {
-  return this.findByIdAndDelete(userId).exec();
+  return this.findByIdAndDelete(userId);
 };
 
+// add product by user
 userSchema.statics.addProductToOrder = async function (
   userId: number,
   productData: {
